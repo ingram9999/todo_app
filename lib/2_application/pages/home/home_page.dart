@@ -5,15 +5,16 @@ import 'package:todo_app/2_application/pages/dashboard/dashboard_page.dart';
 import 'package:todo_app/2_application/pages/overview/overview_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({
+  HomePage({
     super.key,
-    required this.tab,
-  });
+    required String tab,
+  }) : index = tabs.indexWhere((element) => element.name == tab);
 
-  final String tab;
+  final int index;
 
+  // list of all tabs that should be displayed inside our navigation bar
   static const tabs = [
-    DashboardPage.pageConfig,
+    DasboardPage.pageConfig,
     OverviewPage.pageConfig,
   ];
 
@@ -22,19 +23,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late final int index = HomePage.tabs.indexWhere((element) => element.name == widget.tab);
-
   final destinations = HomePage.tabs
       .map(
-        (page) => NavigationDestination(
-          icon: Icon(page.icon),
-          label: page.name,
-        ),
+        (page) => NavigationDestination(icon: Icon(page.icon), label: page.name),
       )
       .toList();
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: SafeArea(
         child: AdaptiveLayout(
@@ -43,11 +41,14 @@ class _HomePageState extends State<HomePage> {
               Breakpoints.mediumAndUp: SlotLayout.from(
                 key: const Key('primary-navigation-medium'),
                 builder: (context) => AdaptiveScaffold.standardNavigationRail(
-                  selectedIndex: index,
+                  selectedLabelTextStyle: TextStyle(color: theme.colorScheme.onSurface),
+                  selectedIconTheme: IconThemeData(color: theme.colorScheme.onSurface),
+                  unselectedIconTheme: IconThemeData(color: theme.colorScheme.onSurface.withOpacity(0.5)),
                   onDestinationSelected: (index) => _tapOnNavigationDestination(context, index),
+                  selectedIndex: widget.index,
                   destinations: destinations
                       .map(
-                        (element) => AdaptiveScaffold.toRailDestination(element),
+                        (destination) => AdaptiveScaffold.toRailDestination(destination),
                       )
                       .toList(),
                 ),
@@ -58,9 +59,9 @@ class _HomePageState extends State<HomePage> {
             config: <Breakpoint, SlotLayoutConfig>{
               Breakpoints.small: SlotLayout.from(
                 key: const Key('bottom-navigation-small'),
-                builder: (context) => AdaptiveScaffold.standardBottomNavigationBar(
-                  currentIndex: index,
+                builder: (_) => AdaptiveScaffold.standardBottomNavigationBar(
                   destinations: destinations,
+                  currentIndex: widget.index,
                   onDestinationSelected: (value) => _tapOnNavigationDestination(context, value),
                 ),
               ),
@@ -69,15 +70,15 @@ class _HomePageState extends State<HomePage> {
           body: SlotLayout(
             config: <Breakpoint, SlotLayoutConfig>{
               Breakpoints.smallAndUp: SlotLayout.from(
-                key: const Key('primary-body'),
-                builder: (_) => HomePage.tabs[index].child,
+                key: const Key('primary-body-small'),
+                builder: (_) => HomePage.tabs[widget.index].child,
               ),
             },
           ),
           secondaryBody: SlotLayout(
             config: <Breakpoint, SlotLayoutConfig>{
               Breakpoints.mediumAndUp: SlotLayout.from(
-                key: const Key('secondary-body'),
+                key: const Key('secondary-body-medium'),
                 builder: AdaptiveScaffold.emptyBuilder,
               ),
             },
@@ -87,6 +88,5 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _tapOnNavigationDestination(BuildContext context, int index) =>
-      context.go('/home/${HomePage.tabs[index].name}');
+  void _tapOnNavigationDestination(BuildContext context, int index) => context.go('/home/${HomePage.tabs[index].name}');
 }
