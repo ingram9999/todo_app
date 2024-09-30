@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:todo_app/2_application/core/page_config.dart';
+import 'package:todo_app/2_application/pages/create_todo_collection/create_todo_collection_page.dart';
 import 'package:todo_app/2_application/pages/dashboard/dashboard_page.dart';
+import 'package:todo_app/2_application/pages/detail/todo_detail_page.dart';
+import 'package:todo_app/2_application/pages/home/bloc/navigation_todo_cubit.dart';
 import 'package:todo_app/2_application/pages/overview/overview_page.dart';
+import 'package:todo_app/2_application/pages/settings/settings_page.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({
@@ -10,11 +16,15 @@ class HomePage extends StatefulWidget {
     required String tab,
   }) : index = tabs.indexWhere((element) => element.name == tab);
 
+  static const PageConfig pageConfig = PageConfig(
+    icon: Icons.home_rounded,
+    name: 'home',
+  );
+
   final int index;
 
-  // list of all tabs that should be displayed inside our navigation bar
   static const tabs = [
-    DasboardPage.pageConfig,
+    DashboardPage.pageConfig,
     OverviewPage.pageConfig,
   ];
 
@@ -25,7 +35,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final destinations = HomePage.tabs
       .map(
-        (page) => NavigationDestination(icon: Icon(page.icon), label: page.name),
+        (page) =>
+            NavigationDestination(icon: Icon(page.icon), label: page.name),
       )
       .toList();
 
@@ -41,14 +52,34 @@ class _HomePageState extends State<HomePage> {
               Breakpoints.mediumAndUp: SlotLayout.from(
                 key: const Key('primary-navigation-medium'),
                 builder: (context) => AdaptiveScaffold.standardNavigationRail(
-                  selectedLabelTextStyle: TextStyle(color: theme.colorScheme.onSurface),
-                  selectedIconTheme: IconThemeData(color: theme.colorScheme.onSurface),
-                  unselectedIconTheme: IconThemeData(color: theme.colorScheme.onSurface.withOpacity(0.5)),
-                  onDestinationSelected: (index) => _tapOnNavigationDestination(context, index),
+                  leading: ElevatedButton(
+                    onPressed: () {},
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(CreateToDoCollectionPage.pageConfig.icon),
+                        const SizedBox(width: 8),
+                        const Text("Add Collection"),
+                      ],
+                    ),
+                  ),
+                  trailing: IconButton(
+                    onPressed: () =>
+                        context.pushNamed(SettingsPage.pageConfig.name),
+                    icon: Icon(SettingsPage.pageConfig.icon),
+                  ),
+                  selectedLabelTextStyle:
+                      TextStyle(color: theme.colorScheme.onSurface),
+                  selectedIconTheme:
+                      IconThemeData(color: theme.colorScheme.onSurface),
+                  unselectedIconTheme: IconThemeData(
+                      color: theme.colorScheme.onSurface.withOpacity(0.5)),
+                  onDestinationSelected: (index) =>
+                      _tapOnNavigationDestination(context, index),
                   selectedIndex: widget.index,
                   destinations: destinations
                       .map(
-                        (destination) => AdaptiveScaffold.toRailDestination(destination),
+                        (dest) => AdaptiveScaffold.toRailDestination(dest),
                       )
                       .toList(),
                 ),
@@ -62,7 +93,8 @@ class _HomePageState extends State<HomePage> {
                 builder: (_) => AdaptiveScaffold.standardBottomNavigationBar(
                   destinations: destinations,
                   currentIndex: widget.index,
-                  onDestinationSelected: (value) => _tapOnNavigationDestination(context, value),
+                  onDestinationSelected: (value) =>
+                      _tapOnNavigationDestination(context, value),
                 ),
               ),
             },
@@ -79,7 +111,30 @@ class _HomePageState extends State<HomePage> {
             config: <Breakpoint, SlotLayoutConfig>{
               Breakpoints.mediumAndUp: SlotLayout.from(
                 key: const Key('secondary-body-medium'),
-                builder: AdaptiveScaffold.emptyBuilder,
+                builder: widget.index != 1
+                    ? null
+                    : (_) => BlocBuilder<NavigationToDoCubit,
+                            NavigationToDoCubitState>(
+                          builder: (context, state) {
+                            final selectedId = state.selectedCollectionId;
+                            final isSecondBodyDisplayed =
+                                Breakpoints.mediumAndUp.isActive(context);
+
+                            context
+                                .read<NavigationToDoCubit>()
+                                .secondBodyHasChanged(
+                                  isSecondBodyDisplayed: isSecondBodyDisplayed,
+                                );
+
+                            if (selectedId == null) {
+                              return const Placeholder();
+                            }
+                            return ToDoDetailPageProvider(
+                              key: Key(selectedId.value),
+                              collectionId: selectedId,
+                            );
+                          },
+                        ),
               ),
             },
           ),
@@ -88,5 +143,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _tapOnNavigationDestination(BuildContext context, int index) => context.go('/home/${HomePage.tabs[index].name}');
+  void _tapOnNavigationDestination(BuildContext context, int index) =>
+      context.goNamed(
+        HomePage.pageConfig.name,
+        pathParameters: {
+          'tab': HomePage.tabs[index].name,
+        },
+      );
 }
