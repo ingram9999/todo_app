@@ -65,8 +65,8 @@ class _CreateToDoCollectionPageState extends State<CreateToDoCollectionPage> {
                   final parsedColorIndex = int.tryParse(value);
                   if (parsedColorIndex == null ||
                       parsedColorIndex < 0 ||
-                      parsedColorIndex > TodoColor.predefinedColors.length) {
-                    return 'Only numbers between 0 and ${TodoColor.predefinedColors.length - 1} are allowed';
+                      parsedColorIndex > ToDoColor.predefinedColors.length) {
+                    return 'Only numbers between 0 and ${ToDoColor.predefinedColors.length - 1} are allowed';
                   }
                 }
                 return null;

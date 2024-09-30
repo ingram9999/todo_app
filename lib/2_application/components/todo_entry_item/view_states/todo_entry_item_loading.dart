@@ -8,7 +8,7 @@ class ToDoEntryItemLoading extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Shimmer(
-        color: Theme.of(context).colorScheme.onSurface,
+        color: Theme.of(context).colorScheme.onBackground,
         child: const Text('Loading'),
       ),
     );

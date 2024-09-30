@@ -1,18 +1,20 @@
-import 'package:either_dart/either.dart';
+
 import 'package:todo_app/1_domain/entities/todo_collection.dart';
 import 'package:todo_app/1_domain/failures/failures.dart';
+import 'package:either_dart/either.dart';
 import 'package:todo_app/1_domain/repositories/todo_repository.dart';
 import 'package:todo_app/core/use_case.dart';
 
 class LoadToDoCollections implements UseCase<List<ToDoCollection>, NoParams> {
-  const LoadToDoCollections({required this.todoRepository});
+  const LoadToDoCollections({required this.toDoRepository});
 
-  final ToDoRepository todoRepository;
+  final ToDoRepository toDoRepository;
 
   @override
   Future<Either<Failure, List<ToDoCollection>>> call(NoParams params) async {
     try {
-      final loadedCollections = todoRepository.readToDoCollections();
+      final loadedCollections = toDoRepository.readToDoCollections();
+
       return loadedCollections.fold(
         (left) => Left(left),
         (right) => Right(right),

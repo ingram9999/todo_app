@@ -1,4 +1,3 @@
-
 part of 'create_todo_collection_page_cubit.dart';
 
 class CreateToDoCollectionPageState extends Equatable {

@@ -6,7 +6,6 @@ import 'package:todo_app/2_application/pages/overview/bloc/todo_overview_cubit.d
 import 'package:todo_app/2_application/pages/overview/view_states/todo_overview_error.dart';
 import 'package:todo_app/2_application/pages/overview/view_states/todo_overview_loaded.dart';
 import 'package:todo_app/2_application/pages/overview/view_states/todo_overview_loading.dart';
-import 'package:todo_app/1_domain/repositories/todo_repository.dart'; // Add this import
 
 class OverviewPageProvider extends StatelessWidget {
   const OverviewPageProvider({super.key});
@@ -16,7 +15,7 @@ class OverviewPageProvider extends StatelessWidget {
     return BlocProvider(
       create: (context) => ToDoOverviewCubit(
         loadToDoCollections: LoadToDoCollections(
-          todoRepository: RepositoryProvider.of<ToDoRepository>(context),
+          toDoRepository: RepositoryProvider.of(context),
         ),
       )..readToDoCollections(),
       child: const OverviewPage(),

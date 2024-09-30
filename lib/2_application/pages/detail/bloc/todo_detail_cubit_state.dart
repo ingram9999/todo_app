@@ -1,6 +1,5 @@
 part of 'todo_detail_cubit.dart';
 
-
 abstract class ToDoDetailCubitState extends Equatable {
   const ToDoDetailCubitState();
 

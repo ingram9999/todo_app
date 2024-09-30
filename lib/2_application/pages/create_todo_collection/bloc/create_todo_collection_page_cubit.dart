@@ -1,4 +1,3 @@
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:todo_app/1_domain/entities/todo_collection.dart';
@@ -29,7 +28,7 @@ class CreateToDoCollectionPageCubit extends Cubit<CreateToDoCollectionPageState>
     await createToDoCollection.call(ToDoCollectionParams(
       collection: ToDoCollection.empty().copyWith(
         title: state.title,
-        color: TodoColor(colorIndex: parsedColorIndex),
+        color: ToDoColor(colorIndex: parsedColorIndex),
       ),
     ));
   }
